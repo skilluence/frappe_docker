@@ -26,20 +26,18 @@ jobs:
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
 
-      - name: Read apps.json
-        id: apps
-        run: echo "APPS_JSON_BASE64=$(base64 -w 0 apps.json)" >> "$GITHUB_OUTPUT"
-
       - name: Build and push
         uses: docker/build-push-action@v6
         with:
           context: .
           file: images/layered/Containerfile
           push: true
+          no-cache: true
           build-args: |
             FRAPPE_BRANCH=version-15
+            FRAPPE_PATH=https://github.com/frappe/frappe
             FRAPPE_IMAGE_PREFIX=frappe
-          secrets: |
-            apps_json=${{ steps.apps.outputs.APPS_JSON_BASE64 }}
+          secret-files: |
+            apps_json=apps.json
           tags: |
             ghcr.io/skilluence/erpnext-hrms:version-15
